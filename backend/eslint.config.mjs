@@ -12,4 +12,10 @@ export default defineConfig([
       sourceType: "commonjs",
     },
   },
+  {
+    files: ["src/_tests_/**/*.js"],
+    languageOptions: {
+      globals: globals.jest,
+    },
+  },
 ]);
