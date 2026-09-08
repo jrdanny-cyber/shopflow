@@ -9,7 +9,7 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
   res.json({
-    application: "ShopFlow",
+    application: "ShopFlow API v2",
     service: "backend",
     status: "running",
   });
