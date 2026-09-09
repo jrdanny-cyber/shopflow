@@ -4,15 +4,39 @@ const productsRouter = require("./routes/products");
 const ordersRouter = require("./routes/orders");
 
 const app = express();
+const {
+  httpRequestsTotal,
+  httpRequestDuration,
+} = require("./metrics");
 
 app.use((req, res, next) => {
-  const start = Date.now();
+  const start = process.hrtime();
 
   res.on("finish", () => {
-    const duration = Date.now() - start;
+    const [seconds, nanoseconds] = process.hrtime(start);
+    const durationSeconds = seconds + nanoseconds / 1e9;
+
+    const route = req.route?.path || req.originalUrl;
+
+    httpRequestsTotal.inc({
+      method: req.method,
+      route,
+      status_code: res.statusCode,
+    });
+
+    httpRequestDuration.observe(
+      {
+        method: req.method,
+        route,
+        status_code: res.statusCode,
+      },
+      durationSeconds,
+    );
+
+    const durationMs = Math.round(durationSeconds * 1000);
 
     console.log(
-      `${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`,
+      `${req.method} ${req.originalUrl} ${res.statusCode} ${durationMs}ms`,
     );
   });
 
