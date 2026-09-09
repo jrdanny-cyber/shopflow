@@ -24,7 +24,7 @@ describe("GET /", () => {
     expect(response.statusCode).toBe(200);
 
     expect(response.body).toEqual({
-      application: "ShopFlow",
+      application: "ShopFlow API v2",
       service: "backend",
       status: "running",
     });

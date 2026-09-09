@@ -6,25 +6,29 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD_FILE: /run/secrets/shopflow_db_password
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
+    secrets:
+      - shopflow_db_password
+      
     networks:
       - shopflow
 
   backend:
-    image: shopflow-backend:v2
+    image: shopflow-backend:v3
 
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: ${POSTGRES_DB}
       DB_USER: ${POSTGRES_USER}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
-
+      
+    secrets:
+      - shopflow_db_password
     networks:
       - shopflow
 
@@ -54,3 +58,7 @@ networks:
 
 volumes:
   postgres_data:
+
+secrets:
+  shopflow_db_password:
+    external: true
