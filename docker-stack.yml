@@ -19,7 +19,7 @@ services:
       - shopflow
 
   backend:
-    image: shopflow-backend:v4
+    image: shopflow-backend:v5
 
     environment:
       DB_HOST: postgres

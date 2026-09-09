@@ -7,6 +7,7 @@ const app = express();
 const {
   httpRequestsTotal,
   httpRequestDuration,
+  register,
 } = require("./metrics");
 
 app.use((req, res, next) => {
@@ -67,6 +68,11 @@ app.get("/health", async (req, res) => {
       database: "disconnected",
     });
   }
+});
+
+app.get("/metrics", async (req, res) => {
+  res.set("Content-Type", register.contentType);
+  res.end(await register.metrics());
 });
 
 app.use("/products", productsRouter);
