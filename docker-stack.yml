@@ -1,57 +1,71 @@
 services:
+   prometheus:
+     image: prom/prometheus:latest
 
-  postgres:
-    image: postgres:17-alpine
+     volumes:
+        - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
 
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD_FILE: /run/secrets/shopflow_db_password
+     networks:
+        - shopflow
 
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+     ports:
+        - "9090:9090"
 
-    secrets:
-      - shopflow_db_password
+     deploy:
+        replicas: 1
+        
+   postgres:
+     image: postgres:17-alpine
+
+     environment:
+       POSTGRES_DB: ${POSTGRES_DB}
+       POSTGRES_USER: ${POSTGRES_USER}
+       POSTGRES_PASSWORD_FILE: /run/secrets/shopflow_db_password
+
+     volumes:
+       - postgres_data:/var/lib/postgresql/data
+       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+     secrets:
+       - shopflow_db_password
       
-    networks:
-      - shopflow
+     networks:
+       - shopflow
 
-  backend:
-    image: shopflow-backend:v5
+   backend:
+     image: shopflow-backend:v7
 
-    environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: ${POSTGRES_DB}
-      DB_USER: ${POSTGRES_USER}
+     environment:
+       DB_HOST: postgres
+       DB_PORT: 5432
+       DB_NAME: ${POSTGRES_DB}
+       DB_USER: ${POSTGRES_USER}
       
-    secrets:
-      - shopflow_db_password
-    networks:
-      - shopflow
+     secrets:
+       - shopflow_db_password
+     networks:
+       - shopflow
 
-    deploy:
-      replicas: 2
+     deploy:
+       replicas: 2
 
-      update_config:
-        parallelism: 1
-        delay: 10s
-        order: start-first
-        failure_action: rollback
+       update_config:
+         parallelism: 1
+         delay: 10s
+         order: start-first
+         failure_action: rollback
 
-  frontend:
-    image: shopflow-frontend:latest
+   frontend:
+     image: shopflow-frontend:latest
 
-    ports:
-      - "8080:80"
+     ports:
+       - "8080:80"
 
-    networks:
-      - shopflow
+     networks:
+       - shopflow
 
-    deploy:
-      replicas: 1
+     deploy:
+       replicas: 1
 
 networks:
   shopflow:

@@ -17,7 +17,7 @@ app.use((req, res, next) => {
     const [seconds, nanoseconds] = process.hrtime(start);
     const durationSeconds = seconds + nanoseconds / 1e9;
 
-    const route = req.route?.path || req.originalUrl;
+    const route = req.baseUrl + (req.route?.path || "").replace(/\/$/, "") || "/";
 
     httpRequestsTotal.inc({
       method: req.method,
