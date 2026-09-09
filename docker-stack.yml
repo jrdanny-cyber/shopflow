@@ -13,7 +13,26 @@ services:
 
      deploy:
         replicas: 1
-        
+
+   grafana:
+     image: grafana/grafana:latest
+
+
+     volumes:
+       - ./grafana/provisioning:/etc/grafana/provisioning:ro
+       - grafana_data:/var/lib/grafana
+
+
+     networks:
+       - shopflow
+     ports:
+       - "3001:3000"
+
+     deploy:
+       replicas: 1
+
+
+
    postgres:
      image: postgres:17-alpine
 
@@ -33,7 +52,7 @@ services:
        - shopflow
 
    backend:
-     image: shopflow-backend:v7
+     image: shopflow-backend:v9
 
      environment:
        DB_HOST: postgres
@@ -72,6 +91,7 @@ networks:
 
 volumes:
   postgres_data:
+  grafana_data:
 
 secrets:
   shopflow_db_password:
